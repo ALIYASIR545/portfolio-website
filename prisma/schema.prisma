@@ -1,0 +1,109 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum Status {
+  UNREAD
+  READ
+  ARCHIVED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id               String              @id @default(cuid())
+  title            String
+  slug             String              @unique
+  shortDescription String
+  description      String              @db.Text
+  year             String
+  category         String
+  featured         Boolean             @default(false)
+  githubUrl        String?
+  liveUrl          String?
+  imageUrl         String?
+  problem          String?             @db.Text
+  solution         String?             @db.Text
+  architecture     String?             @db.Text
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  technologies     ProjectTechnology[]
+}
+
+model Technology {
+  id       String              @id @default(cuid())
+  name     String              @unique
+  category String
+  projects ProjectTechnology[]
+}
+
+model ProjectTechnology {
+  projectId    String
+  technologyId String
+  project      Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  technology   Technology @relation(fields: [technologyId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, technologyId])
+}
+
+model Experience {
+  id               String   @id @default(cuid())
+  role             String
+  company          String
+  period           String
+  description      String   @db.Text
+  responsibilities String[]
+  order            Int      @default(0)
+  createdAt        DateTime @default(now())
+}
+
+model Education {
+  id          String   @id @default(cuid())
+  degree      String
+  institution String
+  period      String
+  gpa         String?
+  details     String[]
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+model Research {
+  id           String   @id @default(cuid())
+  title        String
+  topic        String
+  problem      String   @db.Text
+  approach     String   @db.Text
+  technologies String[]
+  status       String
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String   @db.Text
+  status    Status   @default(UNREAD)
+  createdAt DateTime @default(now())
+}
