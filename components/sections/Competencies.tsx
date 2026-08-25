@@ -13,11 +13,11 @@ const skillCategories = [
   },
   {
     category: 'AI & Data Engineering',
-    skills: ['PyTorch', 'CNN', 'LLAMA 3.1', 'Pandas', 'NumPy', 'Scikit-learn', 'VectorDB', 'Data Pipelines']
+    skills: ['PyTorch', 'CNN',  'Pandas', 'NumPy', 'Scikit-learn', 'VectorDB', 'Data Pipelines']
   },
   {
     category: 'Tools & Cloud Integrations',
-    skills: ['Stripe', 'AWS S3', 'Mailchimp', 'AdPlugg', 'Git/GitHub', 'Docker', 'Linux', 'Postman']
+    skills: ['Stripe', 'AWS S3',  'Git/GitHub', 'Docker','Postman']
   }
 ]
 
