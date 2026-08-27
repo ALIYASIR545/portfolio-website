@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Code2, Play, FileText, ArrowUpRight, Cpu, Plus, X, Upload, Trash2, Edit3 } from 'lucide-react'
+import { usePortfolio } from '@/context/PortfolioContext'
 
 export interface Project {
   id: string
@@ -18,7 +19,9 @@ export interface Project {
 }
 
 export function Projects() {
-  const [projects, setProjects] = useState<Project[]>([])
+  const { data, updateSection, loading } = usePortfolio()
+  const projects: Project[] = data.projects || []
+
   const [activeVideo, setActiveVideo] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
@@ -33,22 +36,6 @@ export function Projects() {
   const [tags, setTags] = useState('')
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [videoFile, setVideoFile] = useState<File | null>(null)
-
-  const fetchProjects = async () => {
-    try {
-      const res = await fetch('/api/projects')
-      if (res.ok) {
-        const data = await res.json()
-        setProjects(data)
-      }
-    } catch (e) {
-      console.error('Failed to load projects', e)
-    }
-  }
-
-  useEffect(() => {
-    fetchProjects()
-  }, [])
 
   const openAddModal = () => {
     setEditingProject(null)
@@ -70,7 +57,7 @@ export function Projects() {
     setDescription(project.description)
     setSourceUrl(project.sourceUrl || '')
     setImageUrl(project.image || '')
-    setTags(project.tags.join(', '))
+    setTags(project.tags ? project.tags.join(', ') : '')
     setImageFile(null)
     setVideoFile(null)
     setIsModalOpen(true)
@@ -80,31 +67,50 @@ export function Projects() {
     e.preventDefault()
     setIsUploading(true)
 
-    const formData = new FormData()
-    if (editingProject) formData.append('id', editingProject.id)
-    formData.append('title', title)
-    formData.append('category', category)
-    formData.append('description', description)
-    formData.append('sourceUrl', sourceUrl)
-    formData.append('imageUrl', imageUrl)
-    formData.append('tags', tags)
+    try {
+      const formData = new FormData()
+      if (editingProject) formData.append('id', editingProject.id)
+      formData.append('title', title)
+      formData.append('category', category)
+      formData.append('description', description)
+      formData.append('sourceUrl', sourceUrl)
+      formData.append('imageUrl', imageUrl)
+      formData.append('tags', tags)
 
-    if (imageFile) formData.append('imageFile', imageFile)
-    if (videoFile) formData.append('videoFile', videoFile)
+      if (imageFile) formData.append('imageFile', imageFile)
+      if (videoFile) formData.append('videoFile', videoFile)
 
-    await fetch('/api/projects', {
-      method: 'POST',
-      body: formData
-    })
+      const res = await fetch('/api/portfolio', {
+        method: 'POST',
+        body: formData,
+      })
 
-    setIsUploading(false)
-    setIsModalOpen(false)
-    fetchProjects()
+      if (!res.ok) throw new Error('Failed to save project')
+
+      const updatedProjectsList = await res.json()
+      
+      // Update global context state
+      await updateSection('projects', updatedProjectsList)
+      setIsModalOpen(false)
+    } catch (err) {
+      console.error('Save error:', err)
+      alert('Failed to save project.')
+    } finally {
+      setIsUploading(false)
+    }
   }
 
   const handleDelete = async (id: string) => {
-    await fetch(`/api/projects?id=${id}`, { method: 'DELETE' })
-    fetchProjects()
+    try {
+      const res = await fetch(`/api/portfolio?id=${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Failed to delete')
+      
+      const updatedProjectsList = projects.filter((p) => p.id !== id)
+      await updateSection('projects', updatedProjectsList)
+    } catch (err) {
+      console.error('Delete error:', err)
+      alert('Failed to delete project.')
+    }
   }
 
   const handlePlayDemo = (videoUrl?: string) => {
@@ -115,11 +121,21 @@ export function Projects() {
     }
   }
 
+  if (loading) {
+    return <div className="py-24 text-center font-mono text-zinc-400">Loading projects...</div>
+  }
+
   return (
     <section id="projects" className="py-24 max-w-7xl mx-auto px-6 border-t border-zinc-800">
-      <div className="flex items-center justify-between mb-12">
+      <motion.div 
+        initial={{ opacity: 0, x: -20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="flex items-center justify-between mb-12"
+      >
         <div className="flex items-center gap-4">
-          <span className="font-mono text-sm text-cyan-400">02 /</span>
+          <span className="font-mono text-sm text-cyan-400">03 /</span>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-100 uppercase">
             Featured Projects & Systems
           </h2>
@@ -130,16 +146,17 @@ export function Projects() {
         >
           <Plus size={14} /> Add Project
         </button>
-      </div>
+      </motion.div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
         {projects.map((project, idx) => (
           <motion.div
             key={project.id}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: idx * 0.08 }}
+            viewport={{ once: true, margin: '-50px' }}
+            whileHover={{ y: -6, transition: { duration: 0.2 } }}
+            transition={{ duration: 0.5, delay: idx * 0.08, ease: 'easeOut' }}
             className="group bg-zinc-900/60 border border-zinc-800 hover:border-cyan-500/50 rounded-lg overflow-hidden flex flex-col justify-between transition-all relative"
           >
             <div>
@@ -157,7 +174,7 @@ export function Projects() {
                   <button
                     onClick={() => openEditModal(project)}
                     className="bg-zinc-900/90 hover:bg-zinc-800 text-cyan-400 p-1.5 rounded transition-colors cursor-pointer border border-zinc-700"
-                    title="Edit / Change Picture"
+                    title="Edit Details"
                   >
                     <Edit3 size={12} />
                   </button>
@@ -180,7 +197,7 @@ export function Projects() {
                 </p>
 
                 <div className="flex flex-wrap gap-1.5 mb-6">
-                  {project.tags.map((tag) => (
+                  {project.tags?.map((tag) => (
                     <span key={tag} className="font-mono text-[10px] px-2 py-0.5 bg-zinc-950 border border-zinc-800 text-zinc-300 rounded">
                       {tag}
                     </span>
@@ -226,7 +243,6 @@ export function Projects() {
         ))}
       </div>
 
-      {/* Video Modal */}
       {activeVideo && (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-zinc-900 border border-zinc-800 w-full max-w-4xl rounded-lg overflow-hidden relative">
@@ -237,7 +253,7 @@ export function Projects() {
               <X size={18} />
             </button>
             <div className="aspect-video w-full flex items-center justify-center bg-black">
-              {activeVideo.endsWith('.mp4') || activeVideo.endsWith('.webm') || activeVideo.startsWith('/uploads/') ? (
+              {activeVideo.startsWith('data:video') || activeVideo.endsWith('.mp4') || activeVideo.endsWith('.webm') ? (
                 <video src={activeVideo} controls autoPlay className="w-full h-full object-contain" />
               ) : (
                 <iframe
@@ -252,7 +268,6 @@ export function Projects() {
         </div>
       )}
 
-      {/* Create / Edit Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <form onSubmit={handleSave} className="bg-zinc-900 border border-zinc-800 p-8 rounded-lg w-full max-w-lg space-y-4 font-mono text-xs max-h-[90vh] overflow-y-auto">
@@ -279,7 +294,6 @@ export function Projects() {
               className="w-full bg-zinc-950 border border-zinc-800 p-3 text-zinc-100 rounded outline-none resize-none focus:border-cyan-400"
             />
 
-            {/* Image File Picker or URL */}
             <div className="space-y-2 border border-zinc-800 p-3 rounded bg-zinc-950/50">
               <label className="text-zinc-300 font-bold">Thumbnail Image</label>
               <div className="flex items-center gap-3">
@@ -301,7 +315,6 @@ export function Projects() {
               />
             </div>
 
-            {/* Video File Picker */}
             <div className="space-y-1">
               <label className="text-zinc-400">Demo Video File (.mp4, .webm)</label>
               <div className="flex items-center gap-3">

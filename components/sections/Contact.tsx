@@ -40,7 +40,7 @@ export function Contact() {
   return (
     <section id="contact" className="py-24 max-w-7xl mx-auto px-6 border-t border-border">
       <div className="flex items-center gap-4 mb-12">
-        <span className="font-mono text-sm text-accent">03 /</span>
+        <span className="font-mono text-sm text-accent">06 /</span>
         <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-primary uppercase">Get In Touch</h2>
       </div>
 

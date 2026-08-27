@@ -28,7 +28,7 @@ export function Research() {
   return (
     <section id="research" className="py-24 max-w-7xl mx-auto px-6 border-t border-zinc-800">
       <div className="flex items-center gap-4 mb-12">
-        <span className="font-mono text-sm text-cyan-400">04 /</span>
+        <span className="font-mono text-sm text-cyan-400">05 /</span>
         <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-zinc-100 uppercase">
           Research & Publications
         </h2>

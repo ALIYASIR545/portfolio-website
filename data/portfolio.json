@@ -1,0 +1,106 @@
+{
+  "projects": [
+    {
+      "id": "hadith-vault",
+      "title": "Hadith Vault",
+      "category": "Full-Stack / Search Engine",
+      "description": "Structured digital repository and search engine for indexing Hadith collections.",
+      "image": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&auto=format&fit=crop&q=60",
+      "videoUrl": "",
+      "sourceUrl": "https://github.com/ALIYASIR545/HadithVault",
+      "demoUrl": "#",
+      "docsUrl": "#",
+      "tags": [
+        "React",
+        "Next.js",
+        "TypeScript",
+        "PostgreSQL"
+      ]
+    },
+    {
+      "id": "research-summarizer",
+      "title": "Research Paper Summarizer",
+      "category": "AI / Document Intelligence",
+      "description": "LLM agent that ingests academic PDFs and extracts key methodologies and findings.",
+      "image": "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&auto=format&fit=crop&q=60",
+      "videoUrl": "",
+      "sourceUrl": "https://github.com/ALIYASIR545/Research-Paper-Summarize",
+      "demoUrl": "#",
+      "docsUrl": "#",
+      "tags": [
+        "Python",
+        "LangChain",
+        "FastAPI",
+        "LLMs"
+      ]
+    },
+    {
+      "id": "global-company-agent",
+      "title": "Global Company Intelligence Agent",
+      "category": "Autonomous Agents / Web Intelligence",
+      "description": "Autonomous research assistant performing web intelligence extraction and financial summary generation.",
+      "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=60",
+      "videoUrl": "",
+      "sourceUrl": "https://github.com/ALIYASIR545",
+      "demoUrl": "#",
+      "docsUrl": "#",
+      "tags": [
+        "Python",
+        "LangChain",
+        "OpenAI",
+        "Streamlit"
+      ]
+    },
+    {
+      "id": "psx-analytics",
+      "title": "PSX Intelligence Analytics Dashboard",
+      "category": "FinTech / Data Engineering",
+      "description": "Real-time financial analytics dashboard tracking Pakistan Stock Exchange data and trends.",
+      "image": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=60",
+      "videoUrl": "",
+      "sourceUrl": "https://github.com/ALIYASIR545",
+      "demoUrl": "#",
+      "docsUrl": "#",
+      "tags": [
+        "Python",
+        "Pandas",
+        "Next.js",
+        "FastAPI"
+      ]
+    },
+    {
+      "id": "crops-disease-system",
+      "title": "Crops Disease AI System",
+      "category": "Computer Vision / AgTech",
+      "description": "Deep Learning solution leveraging CNNs to detect and classify crop diseases early.",
+      "image": "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800&auto=format&fit=crop&q=60",
+      "videoUrl": "",
+      "sourceUrl": "https://github.com/ALIYASIR545",
+      "demoUrl": "#",
+      "docsUrl": "#",
+      "tags": [
+        "PyTorch",
+        "CNN",
+        "FastAPI",
+        "React"
+      ]
+    }
+  ],
+  "experiences": [
+    {
+      "id": "1",
+      "role": "Full Stack Software Developer",
+      "company": "Voltaic.AI",
+      "period": "Jan 2026 - Present",
+      "location": "Lahore, Pakistan",
+      "description": "Architected microservice backend architectures, RAG pipelines, and full-stack web applications.",
+      "skills": [
+        "Python",
+        "FastAPI",
+        "React",
+        "Next.js",
+        "Docker"
+      ]
+    }
+  ]
+}
