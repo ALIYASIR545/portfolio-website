@@ -1,36 +1,10 @@
-{
-  "name": "yasir-portfolio",
-  "version": "0.1.0",
-  "private": true,
-  "prisma": {
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
-  },
-  "scripts": {
-    "dev": "next dev",
-    "postinstall": "prisma generate",
-    "build": "prisma generate && next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "@prisma/client": "^7.9.1",
-    "framer-motion": "^13.1.1",
-    "lucide-react": "^1.33.0",
-    "next": "16.3.2",
-    "react": "19.2.8",
-    "react-dom": "19.2.8",
-    "resend": "^6.22.0",
-    "zod": "^3.23.8"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.3.2",
-    "prisma": "^7.9.1",
-    "tailwindcss": "^4",
-    "typescript": "^5"
-  }
+import { MetadataRoute } from 'next'
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  return [
+    {
+      url: 'https://your-domain.vercel.app',
+      lastModified: new Date(),
+    },
+  ]
 }
