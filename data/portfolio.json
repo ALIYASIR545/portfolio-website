@@ -1,12 +1,24 @@
 {
   "projects": [
     {
+      "id": "1787912669645",
+      "title": "Universal Developer Intelligence MCP",
+      "category": "AI System",
+      "description": "A Model Context Protocol (MCP) server that connects LLM assistants to GitHub repositories and local project directories.",
+      "image": "/uploads/1787912669648-Screenshot_(1719).png",
+      "videoUrl": "",
+      "sourceUrl": "#",
+      "demoUrl": "#",
+      "docsUrl": "#",
+      "tags": []
+    },
+    {
       "id": "hadith-vault",
       "title": "Hadith Vault",
       "category": "Full-Stack / Search Engine",
       "description": "Structured digital repository and search engine for indexing Hadith collections.",
       "image": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=800&auto=format&fit=crop&q=60",
-      "videoUrl": "",
+      "videoUrl": "/uploads/1787912990570-Screen_Recording_2026-02-08_120737.mp4",
       "sourceUrl": "https://github.com/ALIYASIR545/HadithVault",
       "demoUrl": "#",
       "docsUrl": "#",
@@ -23,7 +35,7 @@
       "category": "AI / Document Intelligence",
       "description": "LLM agent that ingests academic PDFs and extracts key methodologies and findings.",
       "image": "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&auto=format&fit=crop&q=60",
-      "videoUrl": "",
+      "videoUrl": "/uploads/1787913257657-Screen_Recording_2025-09-10_135001.mp4",
       "sourceUrl": "https://github.com/ALIYASIR545/Research-Paper-Summarize",
       "demoUrl": "#",
       "docsUrl": "#",
@@ -57,14 +69,14 @@
       "category": "FinTech / Data Engineering",
       "description": "Real-time financial analytics dashboard tracking Pakistan Stock Exchange data and trends.",
       "image": "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&auto=format&fit=crop&q=60",
-      "videoUrl": "",
+      "videoUrl": "/uploads/1787913610920-Screen_Recording_2026-05-17_143604.mp4",
       "sourceUrl": "https://github.com/ALIYASIR545",
       "demoUrl": "#",
       "docsUrl": "#",
       "tags": [
         "Python",
         "Pandas",
-        "Next.js",
+        "React",
         "FastAPI"
       ]
     },

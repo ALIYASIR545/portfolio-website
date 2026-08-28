@@ -2,12 +2,23 @@
 
 import { useState, useEffect, ChangeEvent } from 'react'
 import Link from 'next/link'
-import { ArrowDownRight, FileText, Send, User, Edit3, X, Upload, Image as ImageIcon } from 'lucide-react'
+import { ArrowDownRight, Edit3, X, Upload, Image as ImageIcon, User, Send } from 'lucide-react'
+import { supabase, uploadMedia } from '@/lib/supabase'
 
 export function Hero() {
-  const [data, setData] = useState<any>(null)
+  // Initialize with immediate fallback data so the screen NEVER goes blank
+  const [data, setData] = useState({
+    id: 1,
+    name: 'ALI YASIR',
+    subtitle: 'Full-Stack Software Developer & AI Engineer',
+    description: 'Experienced in constructing end-to-end applications, designing microservice backend architectures, and engineering high-throughput data pipelines.',
+    avatar_url: '',
+    tagline: '// SOFTWARE ARCHITECT & AI ENGINEER'
+  })
+
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
   const [imgError, setImgError] = useState(false)
 
   // Form State
@@ -18,17 +29,23 @@ export function Hero() {
 
   const fetchHeroData = async () => {
     try {
-      const res = await fetch('/api/hero')
-      if (res.ok) {
-        const json = await res.json()
-        setData(json)
-        setImageUrl(json.imageUrl || '')
-        setName(json.name || '')
-        setSubtitle(json.subtitle || '')
-        setDescription(json.description || '')
+      const { data: profile } = await supabase.from('profile').select('*').limit(1).maybeSingle()
+      if (profile) {
+        setData((prev) => ({
+          ...prev,
+          ...profile,
+          name: profile.name || prev.name,
+          subtitle: profile.subtitle || profile.title || prev.subtitle,
+          description: profile.description || profile.bio || prev.description,
+          avatar_url: profile.avatar_url || prev.avatar_url
+        }))
+        setImageUrl(profile.avatar_url || '')
+        setName(profile.name || data.name)
+        setSubtitle(profile.subtitle || profile.title || data.subtitle)
+        setDescription(profile.description || profile.bio || data.description)
       }
     } catch (err) {
-      console.error('Failed to load hero details', err)
+      console.warn('Using local fallback state for Hero section:', err)
     }
   }
 
@@ -36,18 +53,19 @@ export function Hero() {
     fetchHeroData()
   }, [])
 
-  // Handle direct photo selection from computer
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        if (reader.result) {
-          setImageUrl(reader.result as string)
-          setImgError(false)
-        }
-      }
-      reader.readAsDataURL(file)
+    if (!file) return
+
+    setIsUploading(true)
+    try {
+      const publicUrl = await uploadMedia(file, 'avatars')
+      setImageUrl(publicUrl)
+      setImgError(false)
+    } catch (err) {
+      alert('Upload failed: ' + err)
+    } finally {
+      setIsUploading(false)
     }
   }
 
@@ -55,37 +73,48 @@ export function Hero() {
     e.preventDefault()
     setIsSaving(true)
 
-    await fetch('/api/hero', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        imageUrl,
+    try {
+      const payload = {
+        id: 1,
         name,
         subtitle,
+        title: subtitle,
         description,
-      }),
-    })
+        bio: description,
+        avatar_url: imageUrl,
+      }
 
-    setImgError(false)
-    setIsSaving(false)
-    setIsModalOpen(false)
-    fetchHeroData()
+      await supabase.from('profile').upsert(payload)
+      
+      setData((prev) => ({ ...prev, ...payload }))
+      setIsModalOpen(false)
+    } catch (err) {
+      alert('Failed to save to Supabase: ' + err)
+    } finally {
+      setIsSaving(false)
+    }
   }
 
-  if (!data) return null
+  const openModal = () => {
+    setName(data.name)
+    setSubtitle(data.subtitle)
+    setDescription(data.description)
+    setImageUrl(data.avatar_url)
+    setIsModalOpen(true)
+  }
 
   return (
     <section id="home" className="pt-32 pb-20 max-w-7xl mx-auto px-6 border-b border-zinc-800/80 relative">
       <div className="grid lg:grid-cols-12 gap-12 items-center">
         
-        {/* Left Side: Dynamic Text & Action Buttons */}
+        {/* Left Side: Text Content */}
         <div className="lg:col-span-7 space-y-6">
           <div className="flex items-center justify-between">
             <p className="font-mono text-xs sm:text-sm text-cyan-400 tracking-wider">
               {data.tagline}
             </p>
             <button
-              onClick={() => setIsModalOpen(true)}
+              onClick={openModal}
               className="font-mono text-xs bg-zinc-900 hover:bg-zinc-800 text-cyan-400 border border-zinc-800 px-3 py-1.5 rounded flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <Edit3 size={13} /> Edit Hero
@@ -115,11 +144,11 @@ export function Hero() {
 
             <a
               href="https://drive.google.com/file/d/1E4cNJE1kXY2FYuWk-C3ufbDYvsTfTzLB/view?usp=sharing"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="..."
->
-  DOWNLOAD RESUME
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border border-zinc-800 text-zinc-300 font-bold px-6 py-3.5 rounded-lg flex items-center gap-2 hover:border-zinc-700 hover:text-white transition-colors uppercase"
+            >
+              DOWNLOAD RESUME
             </a>
 
             <Link
@@ -131,17 +160,15 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Right Side: Dynamic Photo Container */}
+        {/* Right Side: Profile Picture Box */}
         <div className="lg:col-span-5 flex justify-center lg:justify-end">
           <div className="relative w-full max-w-md aspect-square group">
-            {/* Ambient Cyan Glow */}
             <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-3xl blur opacity-30 group-hover:opacity-60 transition duration-500" />
 
-            {/* Profile Picture Box */}
             <div className="relative w-full h-full rounded-3xl overflow-hidden border-2 border-zinc-800 bg-zinc-900 flex items-center justify-center shadow-2xl">
-              {!imgError && data.imageUrl ? (
+              {!imgError && data.avatar_url ? (
                 <img
-                  src={data.imageUrl}
+                  src={data.avatar_url}
                   alt={data.name}
                   onError={() => setImgError(true)}
                   className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
@@ -151,7 +178,7 @@ export function Hero() {
                   <User size={64} className="text-zinc-700" />
                   <span>No profile photo configured</span>
                   <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={openModal}
                     className="text-cyan-400 underline hover:text-cyan-300 cursor-pointer"
                   >
                     Upload Photo from PC
@@ -165,7 +192,7 @@ export function Hero() {
 
       </div>
 
-      {/* Edit Modal with Direct File Upload */}
+      {/* Edit Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <form
@@ -174,7 +201,7 @@ export function Hero() {
           >
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-base font-bold text-zinc-100 uppercase flex items-center gap-2">
-                <ImageIcon size={16} className="text-cyan-400" /> Dynamic Hero & Photo Setup
+                <ImageIcon size={16} className="text-cyan-400" /> Dynamic Hero Setup
               </h3>
               <button
                 type="button"
@@ -185,28 +212,27 @@ export function Hero() {
               </button>
             </div>
 
-            {/* Direct File Chooser */}
             <div>
               <label className="block text-zinc-400 mb-1">Choose Photo from Computer</label>
               <label className="flex items-center justify-center gap-2 border border-dashed border-zinc-700 hover:border-cyan-400 bg-zinc-950 p-4 rounded-lg cursor-pointer transition-colors text-zinc-300">
                 <Upload size={18} className="text-cyan-400" />
-                <span>Upload Image File (PNG, JPG, WEBP)</span>
+                <span>{isUploading ? 'Uploading to Supabase...' : 'Upload Image File (PNG, JPG)'}</span>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleFileChange}
+                  disabled={isUploading}
                   className="hidden"
                 />
               </label>
             </div>
 
-            {/* Image URL fallback */}
             <div>
-              <label className="block text-zinc-400 mb-1">Or Photo URL / Path</label>
+              <label className="block text-zinc-400 mb-1">Photo URL</label>
               <input
                 type="text"
-                placeholder="https://... or /Ali.jpg"
-                value={imageUrl.startsWith('data:') ? '[Uploaded Local File]' : imageUrl}
+                placeholder="https://..."
+                value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 className="w-full bg-zinc-950 border border-zinc-800 p-3 text-zinc-100 rounded-lg outline-none focus:border-cyan-400"
               />
@@ -247,10 +273,10 @@ export function Hero() {
 
             <button
               type="submit"
-              disabled={isSaving}
+              disabled={isSaving || isUploading}
               className="w-full bg-cyan-400 text-zinc-950 font-bold py-3 uppercase rounded-lg hover:bg-cyan-300 transition-colors mt-4 disabled:opacity-50 cursor-pointer"
             >
-              {isSaving ? 'Saving...' : 'Update Hero Photo & Content'}
+              {isSaving ? 'Saving...' : 'Save & Update'}
             </button>
           </form>
         </div>
